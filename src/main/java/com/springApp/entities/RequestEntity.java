@@ -1,5 +1,7 @@
 package com.springApp.entities;
+
 import lombok.Data;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -21,5 +23,9 @@ public class RequestEntity {
     @Column
     String status;
 
+    @Column
+    Integer client;
 
+    @Column
+    Integer ticket;
 }

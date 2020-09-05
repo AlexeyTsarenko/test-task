@@ -7,11 +7,16 @@ import com.springApp.repositories.RequestRepository;
 import com.springApp.service.RequestService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 @Service
 public class RequestServiceImpl implements RequestService {
@@ -25,15 +30,26 @@ public class RequestServiceImpl implements RequestService {
     }
 
     @Override
-    public RequestEntity save(RequestModel requestModel) {
+    public ResponseEntity<String> save(RequestModel requestModel) {
         RequestEntity requestEntity = modelMapper.map(requestModel, RequestEntity.class);
-        requestEntity.setStatus("UNPROCESSED");
-        return requestRepository.save(requestEntity);
+        Optional<RequestEntity> optional = requestRepository.findFirstByTicket(requestModel.getTicket());
+        if (optional.isEmpty()) {
+            requestEntity.setStatus("UNPROCESSED");
+            requestEntity = requestRepository.save(requestEntity);
+            return new ResponseEntity<>(requestEntity.getId().toString(),HttpStatus.OK);
+        }
+        return new ResponseEntity<>("0", HttpStatus.CONFLICT);
     }
 
     @Override
     public RequestEntity findById(int id) {
         return requestRepository.findById(id).orElseThrow(() -> new RequestException("no such request"));
+    }
+
+    @Override
+    public List<RequestEntity> getAllRequestsByClientId(int id) {
+        return requestRepository.findAllByClient(id).stream().filter(x -> x.getDate().getTime() > System.currentTimeMillis())
+                .collect(Collectors.toList());
     }
 
     public static Properties readPropertiesFile(String fileName) throws IOException {
@@ -43,7 +59,7 @@ public class RequestServiceImpl implements RequestService {
             fis = new FileInputStream(fileName);
             prop = new Properties();
             prop.load(fis);
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             assert fis != null;

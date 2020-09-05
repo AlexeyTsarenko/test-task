@@ -11,4 +11,6 @@ import java.util.Date;
 public class RequestModel {
     private Integer root;
     private Date date;
+    private Integer client;
+    private Integer ticket;
 }
