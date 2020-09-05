@@ -1,6 +1,6 @@
 package com.springApp.service.impl;
 
-import com.springApp.service.ProcessService;
+import com.springApp.service.interfaces.ProcessService;
 import org.springframework.stereotype.Service;
 
 @Service

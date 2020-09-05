@@ -4,7 +4,7 @@ import com.springApp.entities.RequestEntity;
 import com.springApp.exceptions.RequestException;
 import com.springApp.models.RequestModel;
 import com.springApp.repositories.RequestRepository;
-import com.springApp.service.RequestService;
+import com.springApp.service.interfaces.RequestService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -50,22 +50,6 @@ public class RequestServiceImpl implements RequestService {
     public List<RequestEntity> getAllRequestsByClientId(int id) {
         return requestRepository.findAllByClient(id).stream().filter(x -> x.getDate().getTime() > System.currentTimeMillis())
                 .collect(Collectors.toList());
-    }
-
-    public static Properties readPropertiesFile(String fileName) throws IOException {
-        FileInputStream fis = null;
-        Properties prop = null;
-        try {
-            fis = new FileInputStream(fileName);
-            prop = new Properties();
-            prop.load(fis);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            assert fis != null;
-            fis.close();
-        }
-        return prop;
     }
 
 }
