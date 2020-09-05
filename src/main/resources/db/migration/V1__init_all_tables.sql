@@ -1,9 +1,9 @@
-
 CREATE TABLE `requests`
 (
-    `id`                     integer      NOT NULL AUTO_INCREMENT,
-    `root_id`                integer      NOT NULL,
-    `creation_date`          TIMESTAMP    NOT NULL,
+    `id`     integer     NOT NULL AUTO_INCREMENT,
+    `root`   integer     NOT NULL,
+    `date`   TIMESTAMP   NOT NULL,
+    `status` varchar(50) NOT NULL,
 
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB

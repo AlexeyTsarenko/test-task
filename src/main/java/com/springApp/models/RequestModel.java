@@ -9,6 +9,6 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 public class RequestModel {
-    private Integer rootId;
-    private Date creationDate;
+    private Integer root;
+    private Date date;
 }

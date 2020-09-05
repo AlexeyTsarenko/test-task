@@ -1,5 +1,4 @@
 package com.springApp.entities;
-
 import lombok.Data;
 import javax.persistence.*;
 import java.util.Date;
@@ -14,10 +13,13 @@ public class RequestEntity {
     Integer id;
 
     @Column
-    Integer rootId;
+    Integer root;
 
     @Column
-    Date creationDate;
+    Date date;
+
+    @Column
+    String status;
 
 
 }
