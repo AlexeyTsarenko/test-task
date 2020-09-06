@@ -8,7 +8,7 @@ import java.util.Date;
 @Entity
 @Data
 @Table(name = "requests")
-public class RequestEntity {
+public class RequestEntity implements Comparable<RequestEntity> {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +28,9 @@ public class RequestEntity {
 
     @Column
     Integer ticket;
+
+    @Override
+    public int compareTo(RequestEntity req) {
+        return (int) (this.getDate().getTime() - req.getDate().getTime());
+    }
 }

@@ -14,7 +14,7 @@ public class RequestController {
     private final RequestService requestService;
 
     @Autowired
-    public RequestController(RequestService requestService){
+    public RequestController(RequestService requestService) {
         this.requestService = requestService;
     }
 
@@ -22,12 +22,14 @@ public class RequestController {
     ResponseEntity<String> saveRequest(@RequestBody RequestModel requestModel) {
         return requestService.save(requestModel);
     }
+
     @GetMapping("/getStatusForRequest")
-    String getStatus(@RequestParam int id){
+    String getStatus(@RequestParam int id) {
         return requestService.findById(id).getStatus();
     }
+
     @GetMapping("/getAllRequestsByClientId")
-    List<RequestEntity> getAllRequestsByClientId(@RequestParam int id){
+    List<RequestEntity> getAllRequestsByClientId(@RequestParam int id) {
         return requestService.getAllRequestsByClientId(id);
     }
 }

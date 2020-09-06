@@ -32,7 +32,6 @@ public class RequestProcessingService {
     }
 
     private void repair() {
-        System.out.println("repairing");
         List<RequestEntity> reqList = requestRepository.findAllByStatus("STARTEDTOPROCESS");
         reqList.forEach(this::makeCallToProcessingService);
     }
@@ -48,19 +47,12 @@ public class RequestProcessingService {
             synchronized (requestRepository) {
                 optional = requestRepository.findFirstByStatusOrStatus("UNPROCESSED", "PROCESSING");
                 if (optional.isPresent()) {
-                    System.out.println("in the thread" + Thread.currentThread().getName());
-                    System.out.println("working with " + optional.get().getId());
                     RequestEntity requestEntity = optional.get();
                     requestEntity.setStatus("STARTEDTOPROCESS");
                     requestRepository.save(requestEntity);
-                    System.out.println("end" + Thread.currentThread().getName());
                 }
             }
-            if (optional.isPresent()) {
-                makeCallToProcessingService(optional.get());
-            } else {
-                System.out.println("no requests " + Thread.currentThread().getName());
-            }
+            optional.ifPresent(this::makeCallToProcessingService);
             try {
                 cyclicBarrier.await();
             } catch (InterruptedException | BrokenBarrierException e) {

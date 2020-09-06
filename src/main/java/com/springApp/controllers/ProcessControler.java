@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProcessControler {
     private final ProcessService processService;
 
-       @Autowired
-       public ProcessControler(ProcessService processService){
-           this.processService = processService;
-       }
+    @Autowired
+    public ProcessControler(ProcessService processService) {
+        this.processService = processService;
+    }
 
     @GetMapping("/process")
-    String getStatus(){
+    String getStatus() {
         return processService.getStatus();
     }
 }

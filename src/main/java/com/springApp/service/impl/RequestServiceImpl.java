@@ -11,11 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.Properties;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +34,7 @@ public class RequestServiceImpl implements RequestService {
         if (optional.isEmpty()) {
             requestEntity.setStatus("UNPROCESSED");
             requestEntity = requestRepository.save(requestEntity);
-            return new ResponseEntity<>(requestEntity.getId().toString(),HttpStatus.OK);
+            return new ResponseEntity<>(requestEntity.getId().toString(), HttpStatus.OK);
         }
         return new ResponseEntity<>("0", HttpStatus.CONFLICT);
     }
@@ -48,7 +46,9 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestEntity> getAllRequestsByClientId(int id) {
-        return requestRepository.findAllByClient(id).stream().filter(x -> x.getDate().getTime() > System.currentTimeMillis())
+        return requestRepository.findAllByClient(id).stream()
+                .filter(x -> x.getDate().getTime() > System.currentTimeMillis())
+                .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
     }
 

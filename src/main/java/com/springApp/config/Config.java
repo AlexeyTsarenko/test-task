@@ -6,9 +6,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
-import org.springframework.web.reactive.function.client.WebClient;
-
-import java.util.concurrent.Executor;
 
 
 @Configuration
@@ -18,6 +15,7 @@ public class Config {
     public ModelMapper modelMapper() {
         return new ModelMapper();
     }
+
     @Bean
     public TaskExecutor threadPoolTaskExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
