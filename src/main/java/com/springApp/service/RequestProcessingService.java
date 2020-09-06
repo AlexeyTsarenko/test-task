@@ -16,19 +16,16 @@ import java.util.*;
 import java.util.concurrent.Callable;
 import java.util.stream.IntStream;
 
-@Service
-@Scope("prototype")
+
 public class RequestProcessingService implements Runnable{
     private final RequestRepository requestRepository;
     private final WebClient webClient;
-    private final TaskExecutor taskExecutor;
-    private static Object obj = new Object();
-    @Autowired
-    RequestProcessingService(RequestRepository requestRepository, WebClient.Builder webClientBuilder, TaskExecutor taskExecutor){
-        //this.start();
-        this.taskExecutor = taskExecutor;
+
+
+    RequestProcessingService(RequestRepository requestRepository, WebClient webClient){
+
         this.requestRepository = requestRepository;
-        this.webClient = webClientBuilder.baseUrl(PropertyReader.getProperties("server.url")).build();
+        this.webClient = webClient;
       //  int threadAmount = Integer.parseInt(PropertyReader.getProperties("thread.amount"));
 
         //for(int i = 0; i < 3; i++) {
@@ -59,7 +56,7 @@ public class RequestProcessingService implements Runnable{
             }
 
             Optional<RequestEntity> optional;
-            synchronized (obj) {
+            synchronized (requestRepository) {
                  optional = requestRepository.findFirstByStatusOrStatus("UNPROCESSED", "PROCESSING");
 
                 if (optional.isPresent()) {
@@ -67,6 +64,7 @@ public class RequestProcessingService implements Runnable{
                     System.out.println("working with " + optional.get().getId());
                     RequestEntity requestEntity = optional.get();
                     requestEntity.setStatus("STARTEDTOPROCESS");
+                    requestRepository.save(requestEntity);
                     System.out.println("end" + Thread.currentThread().getName());
                 }
             }
