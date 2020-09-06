@@ -1,4 +1,4 @@
-package com.springApp.service.interfaces;
+package com.springApp.services.interfaces;
 
 import org.springframework.stereotype.Service;
 

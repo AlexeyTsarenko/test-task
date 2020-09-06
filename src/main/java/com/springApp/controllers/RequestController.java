@@ -2,7 +2,7 @@ package com.springApp.controllers;
 
 import com.springApp.entities.RequestEntity;
 import com.springApp.models.RequestModel;
-import com.springApp.service.interfaces.RequestService;
+import com.springApp.services.interfaces.RequestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

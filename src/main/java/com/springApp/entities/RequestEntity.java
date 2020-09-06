@@ -3,6 +3,7 @@ package com.springApp.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -14,18 +15,23 @@ public class RequestEntity implements Comparable<RequestEntity> {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Integer id;
 
+    @NotNull
     @Column
     Integer root;
 
+    @NotNull
     @Column
     Date date;
 
+    @NotNull
     @Column
     String status;
 
+    @NotNull
     @Column
     Integer client;
 
+    @NotNull
     @Column
     Integer ticket;
 

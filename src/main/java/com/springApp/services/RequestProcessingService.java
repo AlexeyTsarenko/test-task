@@ -1,8 +1,10 @@
-package com.springApp.service;
+package com.springApp.services;
 
 import com.springApp.config.PropertyReader;
 import com.springApp.entities.RequestEntity;
 import com.springApp.repositories.RequestRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,9 @@ public class RequestProcessingService {
     private final RequestRepository requestRepository;
     private final WebClient webClient;
     private final CyclicBarrier cyclicBarrier;
+    private final int timeToWait = 60000;
+    private final Logger logger = LoggerFactory.getLogger(RequestProcessingService.class);
+
 
     @Autowired
     RequestProcessingService(RequestRepository requestRepository, WebClient.Builder webClientBuilder, TaskExecutor taskExecutor) {
@@ -32,19 +37,16 @@ public class RequestProcessingService {
     }
 
     private void repair() {
+        logger.info("repairing");
         List<RequestEntity> reqList = requestRepository.findAllByStatus("STARTEDTOPROCESS");
         reqList.forEach(this::makeCallToProcessingService);
     }
 
     public void runProcessingTask() {
         for (; ; ) {
-            try {
-                Thread.sleep(10000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
             Optional<RequestEntity> optional;
             synchronized (requestRepository) {
+                logger.info("processing request " + Thread.currentThread().getName());
                 optional = requestRepository.findFirstByStatusOrStatus("UNPROCESSED", "PROCESSING");
                 if (optional.isPresent()) {
                     RequestEntity requestEntity = optional.get();
@@ -58,10 +60,17 @@ public class RequestProcessingService {
             } catch (InterruptedException | BrokenBarrierException e) {
                 e.printStackTrace();
             }
+            try {
+                logger.info(Thread.currentThread().getName() + " sleeping");
+                Thread.sleep(timeToWait);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
+
     private void makeCallToProcessingService(RequestEntity requestEntity) {
-        String response = this.webClient.get().uri(PropertyReader.getProperties("server.url") + "/process").retrieve().bodyToMono(String.class).block();
+        String response = this.webClient.get().uri("/process").retrieve().bodyToMono(String.class).block();
         requestEntity.setStatus(response);
         requestRepository.save(requestEntity);
     }
