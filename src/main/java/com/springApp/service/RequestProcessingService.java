@@ -4,61 +4,49 @@ import com.springApp.config.PropertyReader;
 import com.springApp.entities.RequestEntity;
 import com.springApp.repositories.RequestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.core.task.TaskExecutor;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.stream.IntStream;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
-
-public class RequestProcessingService implements Runnable{
+@Service
+public class RequestProcessingService {
     private final RequestRepository requestRepository;
     private final WebClient webClient;
+    private final CyclicBarrier cyclicBarrier;
 
-
-    RequestProcessingService(RequestRepository requestRepository, WebClient webClient){
-
+    @Autowired
+    RequestProcessingService(RequestRepository requestRepository, WebClient.Builder webClientBuilder, TaskExecutor taskExecutor) {
         this.requestRepository = requestRepository;
-        this.webClient = webClient;
-      //  int threadAmount = Integer.parseInt(PropertyReader.getProperties("thread.amount"));
+        this.webClient = webClientBuilder.baseUrl(PropertyReader.getProperties("server.url")).build();
+        int threadAmount = Integer.parseInt(PropertyReader.getProperties("thread.amount"));
 
-        //for(int i = 0; i < 3; i++) {
-          //  this.taskExecutor.execute(this::runTask);\
-        //    this.taskExecutor.execute(new SomeTask(requestRepository));
-      //  }
-      //  Thread requestRepair = new Thread(this::repair);
-      //  requestRepair.start();
+        for (int i = 0; i < threadAmount; i++) {
+            taskExecutor.execute(this::runProcessingTask);
+        }
+        cyclicBarrier = new CyclicBarrier(threadAmount, this::repair);
     }
-    /*private void repair(){
-        try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        for(;;) {
-            List<RequestEntity> reqList= requestRepository.findAllByStatus("STARTEDTOPROCESS");
-            reqList.forEach(this::makeCallToProcessingService);
-        }
-    }*/
-    @Override
-    public void run(){
-        for(;;) {
+
+    private void repair() {
+        System.out.println("repairing");
+        List<RequestEntity> reqList = requestRepository.findAllByStatus("STARTEDTOPROCESS");
+        reqList.forEach(this::makeCallToProcessingService);
+    }
+
+    public void runProcessingTask() {
+        for (; ; ) {
             try {
                 Thread.sleep(10000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
             Optional<RequestEntity> optional;
             synchronized (requestRepository) {
-                 optional = requestRepository.findFirstByStatusOrStatus("UNPROCESSED", "PROCESSING");
-
+                optional = requestRepository.findFirstByStatusOrStatus("UNPROCESSED", "PROCESSING");
                 if (optional.isPresent()) {
                     System.out.println("in the thread" + Thread.currentThread().getName());
                     System.out.println("working with " + optional.get().getId());
@@ -68,16 +56,20 @@ public class RequestProcessingService implements Runnable{
                     System.out.println("end" + Thread.currentThread().getName());
                 }
             }
-            if(optional.isPresent()) {
+            if (optional.isPresent()) {
                 makeCallToProcessingService(optional.get());
-            }
-            else{
+            } else {
                 System.out.println("no requests " + Thread.currentThread().getName());
+            }
+            try {
+                cyclicBarrier.await();
+            } catch (InterruptedException | BrokenBarrierException e) {
+                e.printStackTrace();
             }
         }
     }
     private void makeCallToProcessingService(RequestEntity requestEntity) {
-        String response = this.webClient.get().uri(PropertyReader.getProperties("server.url")+"/process").retrieve().bodyToMono(String.class).block();
+        String response = this.webClient.get().uri(PropertyReader.getProperties("server.url") + "/process").retrieve().bodyToMono(String.class).block();
         requestEntity.setStatus(response);
         requestRepository.save(requestEntity);
     }
