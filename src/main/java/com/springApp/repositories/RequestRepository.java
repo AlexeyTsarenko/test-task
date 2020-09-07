@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface RequestRepository extends PagingAndSortingRepository<RequestEntity, Integer> {
-    Optional<RequestEntity> findFirstByStatusOrStatus(String status1, String status2);
+    Optional<RequestEntity> findFirstByStatusOrStatusOrStatus(String status1, String status2, String status3);
 
     List<RequestEntity> findAllByClient(int id);
 

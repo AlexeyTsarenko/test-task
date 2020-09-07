@@ -20,7 +20,7 @@ public class RequestProcessingService {
     private final RequestRepository requestRepository;
     private final WebClient webClient;
     //private final CyclicBarrier cyclicBarrier;
-    private final int timeToWait = 60000;
+    private final int timeToWait = 10000;
     private final Logger logger = LoggerFactory.getLogger(RequestProcessingService.class);
 
 
@@ -33,7 +33,7 @@ public class RequestProcessingService {
         for (int i = 0; i < threadAmount; i++) {
             taskExecutor.execute(this::runProcessingTask);
         }
-        taskExecutor.execute(this::repair);
+        //taskExecutor.execute(this::repair);
         //cyclicBarrier = new CyclicBarrier(threadAmount, this::repair);
     }
 
@@ -52,7 +52,7 @@ public class RequestProcessingService {
         for (; ; ) {
             Optional<RequestEntity> optional;
             synchronized (requestRepository) {
-                optional = requestRepository.findFirstByStatusOrStatus("UNPROCESSED", "PROCESSING");
+                optional = requestRepository.findFirstByStatusOrStatusOrStatus("UNPROCESSED", "PROCESSING", "STARTEDTOPROCESS");
                 if (optional.isPresent()) {
                     logger.info("processing request " + Thread.currentThread().getName());
                     RequestEntity requestEntity = optional.get();
