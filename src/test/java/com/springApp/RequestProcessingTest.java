@@ -17,15 +17,8 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 @SpringBootTest
 public class RequestProcessingTest {
 
-
     @Autowired
     private RequestServiceImpl requestService;
-
-    @Autowired
-    private RequestRepository requestRepository;
-
-    @Autowired
-    private ModelMapper modelMapper;
 
     private RequestModel requestModel;
 
@@ -42,17 +35,8 @@ public class RequestProcessingTest {
     @Test
     public void processingTest() throws InterruptedException {
         requestService.save(requestModel);
-        Thread.sleep(62000);
+        Thread.sleep(63000);
         RequestEntity requestEntity = requestService.findById(1);
         assertNotSame("UNPROCESSED", requestEntity.getStatus());
-    }
-    @Test
-    public void repairTest() throws InterruptedException {
-        RequestEntity requestEntity = modelMapper.map(requestModel, RequestEntity.class);
-        requestEntity.setStatus("STARTEDTOPROCESS");
-        requestRepository.save(requestEntity);
-        Thread.sleep(64000);
-        requestEntity = requestService.findById(1);
-        assertNotSame("STARTEDTOPROCESS", requestEntity.getStatus());
     }
 }

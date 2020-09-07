@@ -69,11 +69,19 @@ public class RequestIntegrationTest {
 
     @Order(3)
     @Test
-    public void postingSameDataShouldReturn409() throws Exception {
+    public void postingSameDataShouldReturnConflict() throws Exception {
         mvc.perform(post("/saveRequest")
                 .contentType("application/json")
                 .content(objectMapper.writeValueAsString(requestModel)))
                 .andExpect(status().isConflict());
+    }
+    @Order(3)
+    @Test
+    public void postingSameDataShouldReturnBadRequest() throws Exception {
+        mvc.perform(post("/saveRequest")
+                .contentType("application/json")
+                .content("qwe"))
+                .andExpect(status().isBadRequest());
     }
 
     @Order(4)
