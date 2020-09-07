@@ -32,18 +32,17 @@ public class RequestProcessingService {
     }
 
 
-
     synchronized public void runProcessingTask() {
         for (; ; ) {
             Optional<RequestEntity> optional;
-                optional = requestRepository.findFirstByStatusOrStatusOrStatus("UNPROCESSED", "PROCESSING", "STARTEDTOPROCESS");
-                if (optional.isPresent()) {
-                    logger.info("processing request " + Thread.currentThread().getName());
-                    RequestEntity requestEntity = optional.get();
-                    requestEntity.setStatus("STARTEDTOPROCESS");
-                    requestRepository.save(requestEntity);
-                    makeCallToProcessingService(optional.get());
-                }
+            optional = requestRepository.findFirstByStatusOrStatusOrStatus("UNPROCESSED", "PROCESSING", "STARTEDTOPROCESS");
+            if (optional.isPresent()) {
+                logger.info("processing request " + Thread.currentThread().getName());
+                RequestEntity requestEntity = optional.get();
+                requestEntity.setStatus("STARTEDTOPROCESS");
+                requestRepository.save(requestEntity);
+                makeCallToProcessingService(optional.get());
+            }
             try {
                 logger.info(Thread.currentThread().getName() + " sleeping");
                 Thread.sleep(timeToWait);

@@ -2,11 +2,9 @@ package com.springApp;
 
 import com.springApp.entities.RequestEntity;
 import com.springApp.models.RequestModel;
-import com.springApp.repositories.RequestRepository;
 import com.springApp.services.impl.RequestServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

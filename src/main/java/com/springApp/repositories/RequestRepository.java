@@ -14,7 +14,4 @@ public interface RequestRepository extends PagingAndSortingRepository<RequestEnt
     List<RequestEntity> findAllByClient(int id);
 
     Optional<RequestEntity> findFirstByTicket(int id);
-
-    List<RequestEntity> findAllByStatus(String status);
-
 }
