@@ -19,8 +19,8 @@ import java.util.concurrent.CyclicBarrier;
 public class RequestProcessingService {
     private final RequestRepository requestRepository;
     private final WebClient webClient;
-    private final CyclicBarrier cyclicBarrier;
-    private final int timeToWait = 10000;
+    //private final CyclicBarrier cyclicBarrier;
+    private final int timeToWait = 60000;
     private final Logger logger = LoggerFactory.getLogger(RequestProcessingService.class);
 
 
@@ -33,13 +33,19 @@ public class RequestProcessingService {
         for (int i = 0; i < threadAmount; i++) {
             taskExecutor.execute(this::runProcessingTask);
         }
-        cyclicBarrier = new CyclicBarrier(threadAmount, this::repair);
+        taskExecutor.execute(this::repair);
+        //cyclicBarrier = new CyclicBarrier(threadAmount, this::repair);
     }
 
     private void repair() {
         logger.info("repairing");
         List<RequestEntity> reqList = requestRepository.findAllByStatus("STARTEDTOPROCESS");
         reqList.forEach(this::makeCallToProcessingService);
+        try {
+            Thread.sleep(timeToWait);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     public void runProcessingTask() {
@@ -55,11 +61,6 @@ public class RequestProcessingService {
                 }
             }
             optional.ifPresent(this::makeCallToProcessingService);
-            try {
-                cyclicBarrier.await();
-            } catch (InterruptedException | BrokenBarrierException e) {
-                e.printStackTrace();
-            }
             try {
                 logger.info(Thread.currentThread().getName() + " sleeping");
                 Thread.sleep(timeToWait);

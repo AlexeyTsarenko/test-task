@@ -42,8 +42,17 @@ public class RequestProcessingTest {
     @Test
     public void processingTest() throws InterruptedException {
         requestService.save(requestModel);
-        Thread.sleep(12000);
+        Thread.sleep(62000);
         RequestEntity requestEntity = requestService.findById(1);
         assertNotSame("UNPROCESSED", requestEntity.getStatus());
+    }
+    @Test
+    public void repairTest() throws InterruptedException {
+        RequestEntity requestEntity = modelMapper.map(requestModel, RequestEntity.class);
+        requestEntity.setStatus("STARTEDTOPROCESS");
+        requestRepository.save(requestEntity);
+        Thread.sleep(64000);
+        requestEntity = requestService.findById(1);
+        assertNotSame("STARTEDTOPROCESS", requestEntity.getStatus());
     }
 }
