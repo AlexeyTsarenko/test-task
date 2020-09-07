@@ -40,7 +40,7 @@ public class RequestServiceImpl implements RequestService {
             requestEntity.setStatus("UNPROCESSED");
             requestEntity = requestRepository.save(requestEntity);
             return new ResponseEntity<>(requestEntity.getId().toString(), HttpStatus.CREATED);
-        }else{
+        } else {
             logger.info("Have found request with the same ticket");
         }
         return new ResponseEntity<>("0", HttpStatus.CONFLICT);

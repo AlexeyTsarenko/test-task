@@ -3,7 +3,6 @@ package com.springApp;
 import com.springApp.entities.RequestEntity;
 import com.springApp.models.RequestModel;
 import com.springApp.repositories.RequestRepository;
-import com.springApp.services.RequestProcessingService;
 import com.springApp.services.impl.RequestServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,18 +42,8 @@ public class RequestProcessingTest {
     @Test
     public void processingTest() throws InterruptedException {
         requestService.save(requestModel);
-        Thread.sleep(61000);
+        Thread.sleep(12000);
         RequestEntity requestEntity = requestService.findById(1);
         assertNotSame("UNPROCESSED", requestEntity.getStatus());
     }
-    @Test
-    public void repairTest() throws InterruptedException {
-        RequestEntity requestEntity = modelMapper.map(requestModel, RequestEntity.class);
-        requestEntity.setStatus("STARTEDTOPROCESS");
-        requestRepository.save(requestEntity);
-        Thread.sleep(62000);
-        requestEntity = requestService.findById(1);
-        assertNotSame("STARTEDTOPROCESS", requestEntity.getStatus());
-    }
-
 }

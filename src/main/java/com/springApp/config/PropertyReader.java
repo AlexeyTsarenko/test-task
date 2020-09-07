@@ -20,6 +20,7 @@ public class PropertyReader {
         }
         return prop;
     }
+
     public static String getProperties(String propName) {
         Properties prop = null;
         try {

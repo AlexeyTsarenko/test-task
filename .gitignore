@@ -1,2 +1,4 @@
 .idea/
 spring-test-task.iml
+Log.log
+target/
